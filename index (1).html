@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>⚡</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Caveat:wght@400;600;700&family=Bebas+Neue&family=Noto+Sans+JP:wght@900&family=Cinzel:wght@700;900&family=Permanent+Marker&family=Inter:wght@300;400;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --red:#e63946;
+  --gold:#ffd700;
+  --blue:#457b9d;
+  --dark:#0a0a0f;
+  --white:#f8f9fa;
+}
+
+html,body{
+  width:100%;height:100%;
+  overflow:hidden;
+  background:var(--dark);
+  font-family:'Caveat',cursive;
+  touch-action:none;
+  user-select:none;
+}
+
+/* ── PROGRESS ── */
+#progress{
+  position:fixed;top:0;left:0;right:0;
+  height:3px;background:rgba(255,255,255,0.08);
+  z-index:999;
+}
+#prog-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--red),var(--gold));
+  transition:width 0.5s ease;
+  box-shadow:0 0 8px var(--gold);
+}
+
+/* ── SCENE COUNTER ── */
+#counter{
+  position:fixed;top:10px;right:16px;
+  font-family:'Bangers',cursive;
+  font-size:13px;letter-spacing:2px;
+  color:rgba(255,255,255,0.35);
+  z-index:999;
+}
+
+/* ── FLASH ── */
+#flash{
+  position:fixed;inset:0;
+  background:white;opacity:0;
+  pointer-events:none;z-index:998;
+  transition:opacity 0.08s;
+}
+
+/* ── SCREEN ── */
+#screen{
+  width:100%;height:100%;
+  position:relative;overflow:hidden;
+}
+
+/* ── SCENE BASE ── */
+.scene{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  opacity:0;
+  transition:opacity 0.6s ease;
+  pointer-events:none;
+}
+.scene.active{opacity:1;pointer-events:all;}
+
+/* ── GIF LAYER ── */
+.gif-bg{
+  position:absolute;inset:0;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+}
+.gif-bg img{
+  width:100%;height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+/* ── OVERLAYS ── */
+.overlay-dark{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,0.72);
+}
+.overlay-grad{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,
+    rgba(0,0,0,0.3) 0%,
+    rgba(0,0,0,0.1) 30%,
+    rgba(0,0,0,0.6) 70%,
+    rgba(0,0,0,0.92) 100%
+  );
+}
+.overlay-color{
+  position:absolute;inset:0;
+  mix-blend-mode:color;
+  opacity:0.4;
+}
+.vignette{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,0.7) 100%);
+}
+
+/* ── SPEED LINES ── */
+.speedlines{
+  position:absolute;inset:0;pointer-events:none;
+  background:repeating-conic-gradient(
+    from 0deg at 50% 40%,
+    transparent 0deg,rgba(255,255,255,0.04) 0.8deg,
+    transparent 1.6deg
+  );
+}
+
+/* ── CONTENT ── */
+.content{
+  position:relative;z-index:10;
+  width:100%;padding:0 24px;
+  display:flex;flex-direction:column;
+  align-items:center;
+  max-width:480px;
+  margin:0 auto;
+}
+
+/* ── SCENE LABEL ── */
+.scene-label{
+  font-family:'Caveat',cursive;
+  font-size:clamp(13px,3.8vw,17px);
+  letter-spacing:2px;
+  color:rgba(255,255,255,0.4);
+  text-align:center;
+  margin-bottom:16px;
+  font-weight:600;
+}
+
+/* ── SFX TEXT ── */
+.sfx-text{
+  font-family:'Bangers',cursive;
+  font-size:clamp(36px,11vw,72px);
+  letter-spacing:4px;
+  line-height:1;
+  text-align:center;
+  -webkit-text-stroke:3px rgba(0,0,0,0.8);
+  paint-order:stroke fill;
+  animation:sfxIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  margin-bottom:8px;
+}
+@keyframes sfxIn{
+  from{transform:scale(0.3) rotate(-8deg);opacity:0}
+  to{transform:scale(1) rotate(-3deg);opacity:1}
+}
+
+/* ── MAIN TEXT ── */
+.main-text{
+  font-family:'Caveat',cursive;
+  font-size:clamp(20px,6vw,32px);
+  font-weight:600;
+  color:var(--white);
+  text-align:center;
+  line-height:1.5;
+  letter-spacing:0.5px;
+  text-shadow:0 2px 20px rgba(0,0,0,0.8);
+  animation:textIn 0.5s ease forwards;
+  white-space:pre-line;
+}
+@keyframes textIn{
+  from{transform:translateY(20px);opacity:0}
+  to{transform:translateY(0);opacity:1}
+}
+
+/* Big impact text — Bangers for drama */
+.main-text.big{
+  font-family:'Bangers',cursive;
+  font-size:clamp(32px,10vw,58px);
+  letter-spacing:3px;
+  font-weight:400;
+  line-height:1.15;
+}
+
+/* Cinematic text — Cinzel for epic moments */
+.main-text.cinematic{
+  font-family:'Cinzel',serif;
+  font-size:clamp(16px,4.5vw,22px);
+  letter-spacing:3px;
+  font-weight:700;
+}
+
+/* Handwritten emotional — Caveat italic */
+.main-text.handwritten{
+  font-family:'Caveat',cursive;
+  font-size:clamp(22px,6.5vw,34px);
+  font-style:italic;
+  font-weight:700;
+  line-height:1.6;
+}
+
+.main-text.gold{color:var(--gold);text-shadow:0 0 30px rgba(255,215,0,0.5);}
+.main-text.red{color:var(--red);}
+.main-text.blue{color:#90caf9;}
+
+/* ── DIALOGUE BOX ── */
+.dialogue{
+  background:rgba(10,10,15,0.88);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:16px;
+  padding:20px 24px;
+  width:100%;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  box-shadow:0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+  animation:dialogIn 0.4s ease forwards;
+  margin-top:16px;
+}
+@keyframes dialogIn{
+  from{transform:translateY(30px);opacity:0}
+  to{transform:translateY(0);opacity:1}
+}
+
+.dialogue-text{
+  font-family:'Caveat',cursive;
+  font-size:clamp(18px,5vw,24px);
+  font-weight:600;
+  color:var(--white);
+  line-height:1.65;
+  text-align:center;
+  white-space:pre-line;
+}
+
+/* Italic emotional dialogue */
+.dialogue-text.emotional{
+  font-style:italic;
+  font-size:clamp(20px,5.5vw,26px);
+  color:rgba(255,255,255,0.9);
+}
+
+/* Action/battle dialogue — Bangers */
+.dialogue-text.action{
+  font-family:'Bangers',cursive;
+  font-size:clamp(22px,6vw,32px);
+  letter-spacing:2px;
+}
+
+/* Story narration — Caveat regular */
+.dialogue-text.narrate{
+  font-family:'Caveat',cursive;
+  font-size:clamp(17px,4.8vw,22px);
+  color:rgba(255,255,255,0.8);
+  font-style:italic;
+}
+
+/* ── LINE DOTS ── */
+.dots{
+  display:flex;gap:6px;justify-content:center;
+  margin-top:14px;
+}
+.dot{
+  width:6px;height:6px;border-radius:3px;
+  background:rgba(255,255,255,0.15);
+  transition:all 0.3s;
+}
+.dot.active{
+  width:20px;background:var(--gold);
+  box-shadow:0 0 8px var(--gold);
+}
+.dot.done{background:rgba(255,215,0,0.4);}
+
+/* ── NAV ── */
+#nav{
+  position:fixed;bottom:0;left:0;right:0;
+  padding:16px 20px 28px;
+  background:linear-gradient(to top,rgba(0,0,0,0.6),transparent);
+  display:none;
+  align-items:center;justify-content:center;
+  z-index:100;
+  pointer-events:none;
+}
+.nav-btn{
+  display:none;
+}
+#tap-hint{
+  font-size:11px;letter-spacing:2px;
+  color:rgba(255,255,255,0.25);
+  text-align:center;
+  font-family:'Caveat',cursive;
+  pointer-events:none;
+}
+
+/* ── AUTO SCROLL INDICATOR ── */
+#auto-bar{
+  position:fixed;bottom:0;left:0;
+  height:2px;
+  background:linear-gradient(90deg,rgba(255,215,0,0.6),rgba(255,100,0,0.4));
+  z-index:200;
+  transition:width linear;
+  box-shadow:0 0 6px rgba(255,215,0,0.4);
+}
+
+/* ── SPLASH ── */
+#splash{
+  position:fixed;inset:0;
+  background:#0a0a0f;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  z-index:1000;
+  cursor:pointer;
+  overflow:hidden;
+}
+.splash-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at 20% 20%,rgba(230,57,70,0.12) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 80%,rgba(255,215,0,0.08) 0%,transparent 50%),
+    radial-gradient(ellipse at 60% 30%,rgba(69,123,157,0.08) 0%,transparent 50%);
+}
+/* Animated noise grain */
+.splash-bg::after{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:0.5;
+}
+
+.splash-lines{
+  position:absolute;inset:0;
+  background:repeating-conic-gradient(
+    from 0deg at 50% 50%,
+    transparent 0deg,rgba(255,255,255,0.015) 1deg,
+    transparent 2deg
+  );
+}
+
+.splash-title{
+  font-family:'Bangers',cursive;
+  font-size:clamp(90px,26vw,180px);
+  color:transparent;
+  background:linear-gradient(135deg,#fff 0%,#ffd700 40%,#ff8800 60%,#fff 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  letter-spacing:16px;
+  line-height:0.9;
+  animation:titleGlow 3s ease-in-out infinite;
+  position:relative;z-index:2;
+  text-align:center;
+}
+@keyframes titleGlow{
+  0%,100%{filter:drop-shadow(0 0 30px rgba(255,215,0,0.4))}
+  50%{filter:drop-shadow(0 0 60px rgba(255,215,0,0.8)) drop-shadow(0 0 120px rgba(255,100,0,0.3))}
+}
+
+.splash-sub{
+  font-family:'Caveat',cursive;
+  font-size:clamp(16px,4.5vw,22px);
+  letter-spacing:4px;
+  color:rgba(255,255,255,0.4);
+  text-align:center;
+  margin-top:4px;
+  position:relative;z-index:2;
+  font-style:italic;
+}
+.splash-divider{
+  width:160px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,215,0,0.5),transparent);
+  margin:24px auto;
+  position:relative;z-index:2;
+}
+.splash-info{
+  font-size:10px;letter-spacing:3px;
+  color:rgba(255,255,255,0.2);
+  text-align:center;margin-bottom:48px;
+  position:relative;z-index:2;
+  text-transform:uppercase;
+}
+.splash-btn{
+  font-family:'Bangers',cursive;
+  font-size:18px;letter-spacing:5px;
+  padding:16px 52px;
+  border:1px solid rgba(255,215,0,0.4);
+  background:rgba(255,215,0,0.06);
+  color:var(--gold);
+  border-radius:50px;
+  cursor:pointer;
+  position:relative;z-index:2;
+  transition:all 0.3s;
+  animation:btnPulse 2s ease-in-out infinite;
+  backdrop-filter:blur(8px);
+}
+.splash-btn:hover{
+  background:rgba(255,215,0,0.15);
+  border-color:var(--gold);
+  box-shadow:0 0 30px rgba(255,215,0,0.3);
+}
+@keyframes btnPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.2)}
+  50%{box-shadow:0 0 0 16px rgba(255,215,0,0)}
+}
+
+/* ── SPECIAL SCENES ── */
+
+/* Storm scene */
+.storm-bg{
+  background:linear-gradient(135deg,#050510,#0a0a2e,#05050f);
+}
+
+/* Love message */
+.love-scene{
+  background:linear-gradient(160deg,#050510,#070714,#030308);
+}
+.love-line{
+  font-size:clamp(13px,3.8vw,17px);
+  color:rgba(255,255,255,0.85);
+  line-height:1.8;
+  text-align:center;
+  white-space:pre-line;
+  font-weight:300;
+  padding:16px 20px;
+  border-left:2px solid rgba(68,136,255,0.4);
+  text-align:left;
+  animation:textIn 0.5s ease forwards;
+}
+
+/* Aishiteru */
+.aishiteru-scene{
+  background:radial-gradient(ellipse at center,#050518,#020208);
+}
+.jp-char{
+  display:inline-block;
+  opacity:0;animation:charDrop 0.6s ease forwards;
+}
+@keyframes charDrop{
+  from{opacity:0;transform:translateY(-30px) scale(1.4)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+/* Confetti */
+.confetti{
+  position:absolute;
+  width:8px;height:8px;
+  animation:confettiFall linear infinite;
+  pointer-events:none;
+  border-radius:2px;
+}
+@keyframes confettiFall{
+  0%{transform:translateY(-10px) rotate(0deg);opacity:1}
+  100%{transform:translateY(110vh) rotate(720deg);opacity:0.3}
+}
+
+/* Hearts */
+.heart{
+  position:absolute;
+  animation:heartFloat linear infinite;
+  pointer-events:none;
+  opacity:0;
+}
+@keyframes heartFloat{
+  0%{opacity:0;transform:translateY(0) scale(0.5)}
+  20%{opacity:0.8}
+  100%{opacity:0;transform:translateY(-180px) scale(0.3)}
+}
+
+/* Shake */
+@keyframes screenShake{
+  0%,100%{transform:translate(0,0)}
+  10%{transform:translate(-10px,-5px)}
+  20%{transform:translate(10px,5px)}
+  30%{transform:translate(-8px,4px)}
+  40%{transform:translate(8px,-4px)}
+  50%{transform:translate(-5px,3px)}
+  60%{transform:translate(5px,-3px)}
+  70%{transform:translate(-3px,2px)}
+  80%{transform:translate(3px,-2px)}
+}
+.shaking{animation:screenShake 0.5s ease}
+
+/* Pulse aura */
+@keyframes aura{
+  0%,100%{opacity:0.3;transform:scale(1)}
+  50%{opacity:0.6;transform:scale(1.05)}
+}
+
+/* Keychain */
+.keychain-wrap{
+  display:inline-flex;flex-direction:column;align-items:center;
+  animation:keychainFloat 3s ease-in-out infinite;
+}
+@keyframes keychainFloat{
+  0%,100%{transform:translateY(0) rotate(-3deg)}
+  50%{transform:translateY(-8px) rotate(3deg)}
+}
+.keychain-ring{
+  width:20px;height:20px;
+  border:3px solid rgba(192,192,192,0.8);
+  border-radius:50%;
+  background:none;
+}
+.keychain-body{
+  width:56px;height:76px;
+  background:linear-gradient(135deg,#d0d0d0,#f8f8f8,#b0b0b0,#e8e8e8);
+  border-radius:14px;
+  border:1.5px solid rgba(180,180,180,0.6);
+  box-shadow:
+    2px 2px 8px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.6),
+    inset 0 -1px 0 rgba(0,0,0,0.1),
+    0 0 20px rgba(220,220,255,0.3);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.keychain-body::before{
+  content:'';position:absolute;inset:4px;
+  border-radius:10px;border:1px solid rgba(100,100,100,0.3);
+}
+.keychain-silhouette{
+  font-size:28px;
+  filter:grayscale(1) contrast(2);
+  opacity:0.8;
+}
+
+/* Girl hand */
+.girl-scene{
+  background:radial-gradient(ellipse at 30% 50%,rgba(255,200,150,0.08),transparent 60%),
+             linear-gradient(135deg,#080010,#100020,#050008);
+}
+
+/* Floating particles */
+.particle{
+  position:absolute;border-radius:50%;
+  animation:particleFloat linear infinite;
+  pointer-events:none;
+}
+@keyframes particleFloat{
+  0%{transform:translate(0,0);opacity:0}
+  20%{opacity:1}
+  100%{transform:translate(var(--dx),var(--dy));opacity:0}
+}
+
+/* Auto-scroll ring */
+#auto-ring{
+  position:fixed;
+  bottom:36px;left:50%;transform:translateX(-50%);
+  width:28px;height:28px;
+  z-index:200;opacity:0;
+  transition:opacity 0.4s;
+  pointer-events:none;
+}
+#auto-ring.visible{opacity:0.45;}
+#ring-circle{
+  fill:none;
+  stroke:rgba(255,255,255,0.5);
+  stroke-width:2.5;
+  stroke-dasharray:75.4;
+  stroke-dashoffset:75.4;
+  transform:rotate(-90deg);
+  transform-origin:50% 50%;
+}
+
+/* Swipe hint */
+#swipe-hint{
+  position:fixed;bottom:76px;left:50%;transform:translateX(-50%);
+  font-family:'Caveat',cursive;font-size:13px;font-style:italic;
+  color:rgba(255,255,255,0.28);letter-spacing:1px;
+  z-index:200;pointer-events:none;white-space:nowrap;
+  animation:fadeHint 3.5s ease forwards;
+}
+@keyframes fadeHint{
+  0%{opacity:0}15%{opacity:1}75%{opacity:1}100%{opacity:0}
+}
+
+/* Nav hidden by default, shows on long press */
+#nav{
+  position:fixed;bottom:0;left:0;right:0;
+  padding:12px 20px 24px;
+  background:linear-gradient(to top,rgba(0,0,0,0.9),rgba(0,0,0,0.5),transparent);
+  display:none;
+  align-items:center;justify-content:space-between;
+  z-index:100;
+  opacity:0;transition:opacity 0.4s;
+}
+#nav.visible{opacity:1;}
+.nav-btn{
+  font-family:'Caveat',cursive;
+  font-size:15px;letter-spacing:1px;
+  padding:8px 18px;
+  border:1px solid rgba(255,255,255,0.2);
+  background:rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.55);
+  border-radius:8px;cursor:pointer;
+  backdrop-filter:blur(8px);
+  transition:all 0.2s;font-style:italic;
+}
+.nav-btn.next{border-color:var(--gold);color:var(--gold);background:rgba(255,215,0,0.08);}
+#tap-hint{
+  font-family:'Caveat',cursive;font-size:12px;font-style:italic;
+  color:rgba(255,255,255,0.2);text-align:center;letter-spacing:1px;
+}
+</style>
+</head>
+<body>
+
+<div id="progress"><div id="prog-fill" style="width:0%"></div></div>
+<div id="counter">1 / 16</div>
+<div id="flash"></div>
+
+<!-- SPLASH -->
+<div id="splash" onclick="startStory()">
+  <div class="splash-bg"></div>
+  <div class="splash-lines"></div>
+  <div id="splash-content" style="position:relative;z-index:2;text-align:center">
+    <div style="font-size:clamp(80px,25vw,160px);animation:titleGlow 2s ease-in-out infinite;line-height:1">⚡</div>
+    <div class="splash-divider"></div>
+    <div class="splash-info" style="font-family:'Caveat',cursive;font-size:14px;font-style:italic;letter-spacing:3px">something for you...</div>
+    <button class="splash-btn" onclick="startStory()">▶ &nbsp; OPEN</button>
+  </div>
+</div>
+
+<!-- SCREEN -->
+<div id="screen"></div>
+
+<!-- AUTO SCROLL RING -->
+<div id="auto-ring">
+  <svg viewBox="0 0 28 28">
+    <circle cx="14" cy="14" r="12" id="ring-circle"/>
+  </svg>
+</div>
+
+<!-- SWIPE HINT -->
+<div id="swipe-hint">swipe ← → or tap to skip</div>
+
+<!-- NAV (hidden, shows on hold) -->
+<div id="nav">
+  <button class="nav-btn" onclick="prevScene()">◀ BACK</button>
+  <div id="tap-hint">tap · swipe · auto</div>
+  <button class="nav-btn next" onclick="nextLine()">NEXT ▶</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// SCENE DEFINITIONS
+// ═══════════════════════════════════════
+const SCENES = [
+
+  // 1. STORM
+  {
+    label:'THE STORM AWAKENS',
+    sfx:'KRAAAK!!', sfxColor:'#88ccff',
+    shake:true, flash:true,
+    bg:'linear-gradient(135deg,#050510,#0a0a2e,#05050f)',
+    gif:'https://media.giphy.com/media/xUA7bdpLxQhsSQdyog/giphy.gif',
+    gifOpacity:0.45,
+    accentColor:'#88ccff',
+    lines:[
+      {text:'On a night like no other...', style:'big gold'},
+      {text:'The sky cracked open.', style:'big'},
+      {text:'Thunder shook the earth to its core.', style:'normal'},
+      {text:'The storm had a purpose tonight. ⚡', style:'big gold'},
+    ]
+  },
+
+  // 2. PROPHECY
+  {
+    label:'THE PROPHECY',
+    sfx:'', sfxColor:'#ffd700',
+    shake:false, flash:false,
+    bg:'linear-gradient(135deg,#100800,#1a1000,#080400)',
+    gif:'https://media.giphy.com/media/l3vQXrBGs3HQnz6SQ/giphy.gif',
+    gifOpacity:0.3,
+    accentColor:'#ffd700',
+    lines:[
+      {text:'Ancient scrolls spoke of a warrior...', style:'normal'},
+      {text:'Born under the storm.', style:'big gold'},
+      {text:'Loved by someone rare. 💙', style:'normal'},
+      {text:'"His name..." the scroll whispered.', style:'normal italic'},
+      {text:'...is SIDD.', style:'big gold'},
+    ]
+  },
+
+  // 3. MORNING
+  {
+    label:"SIDD'S MORNING RITUAL",
+    sfx:'Ahhhh... ☕', sfxColor:'#d2691e',
+    shake:false, flash:false,
+    bg:'linear-gradient(160deg,#1a0800,#2d1200,#1a0800)',
+    gif:null,
+    accentColor:'#d2691e',
+    lines:[
+      {text:'Every legend has a ritual...', style:'normal'},
+      {text:'Coffee. Hot. Strong. ☕', style:'big gold'},
+      {text:'A cigarette. Quiet. 🚬', style:'big'},
+      {text:'Popcorn. Always. 🍿', style:'big'},
+      {text:'Simple. Perfect.\nHis way. 😎', style:'big gold'},
+    ]
+  },
+
+  // 4. PIZZA
+  {
+    label:'THE CHEESE CORN PIZZA ARRIVES',
+    sfx:'BOOM!! 🍕', sfxColor:'#ff6600',
+    shake:true, flash:true,
+    bg:'linear-gradient(135deg,#1a0800,#2a1000,#0f0500)',
+    gif:'https://media.giphy.com/media/26tOZ42Mg6pbTUPHW/giphy.gif',
+    gifOpacity:0.4,
+    accentColor:'#ff6600',
+    lines:[
+      {text:'But nothing...', style:'big'},
+      {text:'NOTHING...', style:'big red'},
+      {text:'Could prepare the world.', style:'normal'},
+      {text:'🍕 THE CHEESE CORN PIZZA.', style:'big gold'},
+      {text:"Sidd's ultimate weapon had arrived.", style:'normal'},
+    ]
+  },
+
+  // 5. TRIO SENSES
+  {
+    label:'THREE WARRIORS SENSE HIM',
+    sfx:'DATTEBAYO!!', sfxColor:'#ff8c00',
+    shake:false, flash:true,
+    bg:'linear-gradient(135deg,#050510,#0a0a1a,#050505)',
+    gif:'https://media.giphy.com/media/sULKEgDMX8LcI/giphy.gif',
+    gifOpacity:0.5,
+    accentColor:'#ff8c00',
+    lines:[
+      {text:'Across three worlds...', style:'normal'},
+      {text:'Naruto stopped mid-run. 🍃', style:'big'},
+      {text:"Luffy's eyes went wide. 🌊", style:'big'},
+      {text:'Tanjiro sniffed the air. 🗡️', style:'big'},
+      {text:'They all felt it.\nSomething powerful.', style:'big gold'},
+    ]
+  },
+
+  // 6. SIDD REVEAL
+  {
+    label:'THEY FIND SIDD',
+    sfx:'NAKAMA!!', sfxColor:'#4488ff',
+    shake:false, flash:false,
+    bg:'linear-gradient(160deg,#000a1a,#001428,#000810)',
+    gif:'https://media.giphy.com/media/l4FGuhL4U2WyjdkaY/giphy.gif',
+    gifOpacity:0.4,
+    accentColor:'#4488ff',
+    lines:[
+      {text:'They came looking for a fight.', style:'normal'},
+      {text:'They found something else entirely.', style:'normal'},
+      {text:'6 feet tall.\nBrown spiky hair.\nGreen shirt.\nPearl necklace.\nSilver bracelet.', style:'normal'},
+      {text:'An unbothered smirk. 😏', style:'big gold'},
+      {text:'They had found\na LEGEND.', style:'big gold'},
+    ]
+  },
+
+  // 7. CHALLENGE
+  {
+    label:'THE CHALLENGE',
+    sfx:'CHALLENGE!!', sfxColor:'#ff4444',
+    shake:true, flash:true,
+    bg:'linear-gradient(135deg,#0a0000,#1a0505,#050000)',
+    gif:'https://media.giphy.com/media/xT9IgG50Lg7rusRgqA/giphy.gif',
+    gifOpacity:0.45,
+    accentColor:'#ff4444',
+    lines:[
+      {text:'"We challenge you!" they shouted.', style:'big red'},
+      {text:'Naruto cracked his knuckles.', style:'normal'},
+      {text:'Luffy stretched his arms wide.', style:'normal'},
+      {text:'Tanjiro drew his blade.', style:'normal'},
+      {text:'Sidd took a long sip of coffee. ☕', style:'normal'},
+      {text:'"Sure." he said. 😏', style:'big gold'},
+    ]
+  },
+
+  // 8. BATTLE
+  {
+    label:'BATTLE BEGINS',
+    sfx:'RASENGAN!!', sfxColor:'#ffff00',
+    shake:true, flash:true,
+    bg:'linear-gradient(135deg,#0a0a00,#1a1a00,#050500)',
+    gif:'https://media.giphy.com/media/xT9IgG50Lg7rusRgqA/giphy.gif',
+    gifOpacity:0.5,
+    accentColor:'#ffff00',
+    lines:[
+      {text:'RASENGAN!! ⚡', style:'big gold'},
+      {text:'GOMU GOMU NO PISTOL!! 🌊', style:'big blue'},
+      {text:'HINOKAMI KAGURA!! 🔥', style:'big red'},
+      {text:'Three worlds.\nOne man.', style:'big'},
+      {text:'Sidd stood there.\nUnmoved.', style:'big gold'},
+    ]
+  },
+
+  // 9. SIDD FIGHTS BACK
+  {
+    label:'SIDD FIGHTS BACK',
+    sfx:'BOOM!! 💥', sfxColor:'#ff8800',
+    shake:true, flash:true,
+    bg:'linear-gradient(135deg,#1a0500,#2a0a00,#0a0200)',
+    gif:'https://media.giphy.com/media/26tOZ42Mg6pbTUPHW/giphy.gif',
+    gifOpacity:0.45,
+    accentColor:'#ff8800',
+    lines:[
+      {text:'Sidd cracked his knuckles.', style:'normal'},
+      {text:'He smirked that smirk.', style:'normal'},
+      {text:'One move.', style:'big gold'},
+      {text:'Just. One. Move.', style:'big red'},
+      {text:'💥 ALL THREE...\nSENT FLYING. 💥', style:'big gold'},
+      {text:'"6 feet of pure legend." 😎', style:'normal'},
+    ]
+  },
+
+  // 10. EXHAUSTED
+  {
+    label:'EVERYONE EXHAUSTED',
+    sfx:'...phew...', sfxColor:'#88ff88',
+    shake:false, flash:false,
+    bg:'linear-gradient(160deg,#001400,#002000,#000a00)',
+    gif:null,
+    accentColor:'#44cc44',
+    lines:[
+      {text:'And then... silence. 😅', style:'big'},
+      {text:'Naruto: flat on his back. 😵\nLuffy: tangled in himself. 😵\nTanjiro: face in the dirt. 😵', style:'normal'},
+      {text:'Sidd:\nstill looking fresh. 😎', style:'big gold'},
+      {text:'"Anyone want\nsome popcorn?" 🍿', style:'big gold'},
+    ]
+  },
+
+  // 11. TWIST
+  {
+    label:'THE TWIST 🎆',
+    sfx:'🎆 BOOM!!', sfxColor:'#ffff00',
+    shake:true, flash:true,
+    bg:'linear-gradient(135deg,#000000,#050505,#000000)',
+    gif:'https://media.giphy.com/media/3o7abGQa0aRJUurpII/giphy.gif',
+    gifOpacity:0.5,
+    accentColor:'#ffff00',
+    lines:[
+      {text:'Everything went dark.', style:'big'},
+      {text:'Silent.', style:'big'},
+      {text:'And then...', style:'normal'},
+      {text:'A single firecracker\nflew into the sky. 🎆', style:'big gold'},
+      {text:'...they had been planning\nthis ALL along.', style:'big red'},
+      {text:'It was never a battle. 😂', style:'big gold'},
+    ]
+  },
+
+  // 12. PARTY
+  {
+    label:'🎉 SURPRISE PARTY!! 🎉',
+    sfx:'HAPPY BIRTHDAY!!!', sfxColor:'#ff44aa',
+    shake:true, flash:true,
+    bg:'linear-gradient(135deg,#1a0030,#2a0050,#100020)',
+    gif:'https://media.giphy.com/media/26BRBKqUiq586bRVm/giphy.gif',
+    gifOpacity:0.5,
+    accentColor:'#ff44aa',
+    lines:[
+      {text:'🎉 SURPRISE SIDD!!! 🎉', style:'big gold'},
+      {text:'🍕 Pizza!  🍺 Beer!\n🍿 Popcorn!  🚬 Cigar!\n🎆 Fireworks!', style:'normal'},
+      {text:'Naruto dancing.\nLuffy eating EVERYTHING.\nTanjiro crying happy tears. 😂', style:'normal'},
+      {text:'And Sidd...\nsmiling that smile. 😏', style:'big gold'},
+    ],
+    confetti:true
+  },
+
+  // 13. LOVE MSG
+  {
+    label:'A MESSAGE FROM THE HEART 💙',
+    sfx:'', sfxColor:'#4488ff',
+    shake:false, flash:false,
+    bg:'linear-gradient(160deg,#000510,#00071a,#000308)',
+    gif:null,
+    accentColor:'#4488ff',
+    loveScene:true,
+    lines:[
+      {text:'You came into this world like a storm ⚡\nLoud, exciting, impossible to ignore.', style:'love'},
+      {text:'Cheese corn pizza is your love language.\n☕ is your superpower. 🍿 is your therapy.\nAnd a cigarette ties it all together. 🚬', style:'love'},
+      {text:'You get excited about the smallest things —\nAnd that excitement?\nThat\'s contagious. That\'s magic.\nThat\'s YOU.', style:'love'},
+      {text:'Naruto never gives up.\nLuffy chases his dream.\nTanjiro protects what he loves.\nBut Sidd? Does all three...\nwhile eating cheese corn pizza. 😂', style:'love'},
+      {text:'You are someone\'s favourite storm.\nSomeone\'s favourite chaos.\nSomeone\'s favourite human. 💙', style:'love'},
+      {text:'Happy Birthday Sidd.\nStay wild. Stay loud.\nStay YOU. 💙⚡🍕', style:'love big'},
+    ]
+  },
+
+  // 14. SCROLL
+  {
+    label:"THE ANIME WORLD'S MESSAGE",
+    sfx:'...', sfxColor:'#ffd700',
+    shake:false, flash:false,
+    bg:'linear-gradient(160deg,#0a0800,#180f00,#050400)',
+    gif:null,
+    accentColor:'#ffd700',
+    lines:[
+      {text:'The anime world left one final message...', style:'normal'},
+      {text:'"You are braver than Naruto,\nFreer than Luffy,\nKinder than Tanjiro."', style:'normal italic gold'},
+      {text:'"You get excited over\ncheese corn pizza —\nand that makes you perfect."', style:'normal italic'},
+      {text:'"Happy Birthday Sidd —\nthe world\'s most\nlegendary human. 🎂💙"', style:'big gold'},
+    ]
+  },
+
+  // 15. HER
+  {
+    label:'HER',
+    sfx:'', sfxColor:'#ffaadd',
+    shake:false, flash:false,
+    bg:'radial-gradient(ellipse at 30% 50%,rgba(255,180,120,0.06),transparent 60%), linear-gradient(135deg,#080010,#100020,#050008)',
+    gif:null,
+    accentColor:'#ffaadd',
+    herScene:true,
+    lines:[
+      {text:'And then...', style:'normal'},
+      {text:'Someone stepped forward.', style:'big'},
+      {text:'Soft light.\nFace hidden.\nWolf cut hair.\nBlack & brown. 🤍', style:'normal'},
+      {text:'She reached out her hand...', style:'normal'},
+      {text:'A silver keychain.\nHis anime outline engraved on it. ✨', style:'normal'},
+      {text:'She leaned close\nto his ear... 💙', style:'normal'},
+      {text:'"You\'re not just my favourite story, Sidd...\nyou\'re my favourite person." 💙', style:'normal italic'},
+    ]
+  },
+
+  // 16. AISHITERU
+  {
+    label:'愛してる',
+    sfx:'', sfxColor:'#88aaff',
+    shake:false, flash:false,
+    bg:'radial-gradient(ellipse at center,#050518,#020208)',
+    gif:null,
+    accentColor:'#88aaff',
+    aishiteruScene:true,
+    lines:[
+      {text:'She whispered...', style:'normal'},
+      {text:'__AISHITERU__', style:'aishiteru'},
+      {text:'I love you.', style:'normal italic'},
+      {text:'💙', style:'heart'},
+    ]
+  }
+];
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let si=0, li=0, busy=false;
+
+// ═══════════════════════════════════════
+// AUDIO ENGINE
+// ═══════════════════════════════════════
+let actx=null;
+function ac(){
+  if(!actx) actx=new(window.AudioContext||window.webkitAudioContext)();
+  return actx;
+}
+function tone(f,d,t='sine',v=0.25,delay=0){
+  try{
+    const a=ac(),o=a.createOscillator(),g=a.createGain();
+    o.connect(g);g.connect(a.destination);
+    o.type=t;o.frequency.value=f;
+    g.gain.setValueAtTime(0,a.currentTime+delay);
+    g.gain.linearRampToValueAtTime(v,a.currentTime+delay+0.02);
+    g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+delay+d);
+    o.start(a.currentTime+delay);o.stop(a.currentTime+delay+d+0.1);
+  }catch(e){}
+}
+function noise(d,f,v=0.2){
+  try{
+    const a=ac(),buf=a.createBuffer(1,a.sampleRate*d,a.sampleRate);
+    const data=buf.getChannelData(0);
+    for(let i=0;i<data.length;i++)data[i]=Math.random()*2-1;
+    const s=a.createBufferSource(),flt=a.createBiquadFilter(),g=a.createGain();
+    flt.type='lowpass';flt.frequency.value=f;
+    s.buffer=buf;s.connect(flt);flt.connect(g);g.connect(a.destination);
+    g.gain.setValueAtTime(v,a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+d);
+    s.start();s.stop(a.currentTime+d+0.1);
+  }catch(e){}
+}
+
+function playSound(idx){
+  const fns=[
+    ()=>{noise(1.5,150,0.4);tone(60,1.5,'sawtooth',0.15)},
+    ()=>{tone(440,0.6,'sine',0.2);tone(554,0.9,'sine',0.15,0.4);tone(659,1.5,'sine',0.1,0.8)},
+    ()=>{tone(261,2,'sine',0.12);tone(329,2,'sine',0.08,0.3)},
+    ()=>{noise(0.08,400,0.6);tone(110,1,'sawtooth',0.3,0.1)},
+    ()=>{tone(523,0.25,'square',0.18);tone(659,0.25,'square',0.15,0.2);tone(784,0.4,'square',0.18,0.4)},
+    ()=>{tone(196,0.4,'sawtooth',0.18);tone(294,0.4,'sawtooth',0.15,0.3);tone(392,0.6,'sawtooth',0.18,0.5)},
+    ()=>{noise(0.06,500,0.5);tone(293,0.8,'sawtooth',0.25,0.1)},
+    ()=>{noise(0.04,700,0.7);tone(110,0.6,'sawtooth',0.4);noise(0.2,300,0.3,0.1)},
+    ()=>{noise(0.05,600,0.8);tone(80,0.8,'square',0.5)},
+    ()=>{tone(523,0.3,'sine',0.15);tone(392,0.4,'sine',0.1,0.2)},
+    ()=>{noise(0.04,900,0.6);tone(880,0.5,'square',0.3);tone(440,1,'sine',0.15,0.4)},
+    ()=>{[523,659,784,1047].forEach((f,i)=>tone(f,0.3,'square',0.15,i*0.08));tone(1047,1.5,'sine',0.2,0.5)},
+    ()=>{tone(329,4,'sine',0.12);tone(415,4,'sine',0.08,0.3);tone(494,4,'sine',0.06,0.6)},
+    ()=>{tone(440,0.5,'sine',0.12);tone(554,1,'sine',0.08,0.4)},
+    ()=>{tone(523,0.6,'sine',0.1);tone(659,1.2,'sine',0.07,0.5);tone(880,2,'sine',0.05,1)},
+    ()=>{[261,392,523,784].forEach((f,i)=>{tone(f,5,'sine',0.14-i*0.03,i*0.15)})},
+  ];
+  if(fns[idx])fns[idx]();
+}
+
+// ═══════════════════════════════════════
+// EFFECTS
+// ═══════════════════════════════════════
+function doFlash(){
+  const f=document.getElementById('flash');
+  f.style.opacity='0.85';
+  setTimeout(()=>f.style.opacity='0.3',80);
+  setTimeout(()=>f.style.opacity='0',200);
+}
+function doShake(){
+  const s=document.getElementById('screen');
+  s.classList.add('shaking');
+  setTimeout(()=>s.classList.remove('shaking'),500);
+}
+function spawnConfetti(el){
+  const colors=['#ff4444','#ffff00','#44ff44','#4488ff','#ff44ff','#ff8800','#44ffff'];
+  for(let i=0;i<50;i++){
+    const c=document.createElement('div');
+    c.className='confetti';
+    c.style.cssText=`
+      left:${Math.random()*100}%;
+      top:-10px;
+      background:${colors[i%colors.length]};
+      width:${6+Math.random()*8}px;
+      height:${4+Math.random()*6}px;
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+      animation-duration:${1.5+Math.random()*2}s;
+      animation-delay:${Math.random()*1.5}s;
+    `;
+    el.appendChild(c);
+  }
+}
+function spawnHearts(el){
+  const emojis=['💙','💜','🤍','💫'];
+  for(let i=0;i<12;i++){
+    const h=document.createElement('div');
+    h.className='heart';
+    h.textContent=emojis[i%emojis.length];
+    h.style.cssText=`
+      left:${Math.random()*85}%;
+      bottom:${10+Math.random()*30}%;
+      font-size:${14+Math.random()*18}px;
+      animation-duration:${2+Math.random()*3}s;
+      animation-delay:${Math.random()*4}s;
+    `;
+    el.appendChild(h);
+  }
+}
+
+// ═══════════════════════════════════════
+// RENDER SCENE
+// ═══════════════════════════════════════
+function renderScene(sceneEl, scene, lineIdx){
+  sceneEl.innerHTML='';
+  sceneEl.style.background=scene.bg;
+
+  // GIF background
+  if(scene.gif){
+    const gw=document.createElement('div');
+    gw.className='gif-bg';
+    gw.style.opacity=scene.gifOpacity||0.4;
+    const img=document.createElement('img');
+    img.src=scene.gif;
+    img.alt='';
+    gw.appendChild(img);
+    sceneEl.appendChild(gw);
+    // Overlays
+    const ov1=document.createElement('div');ov1.className='overlay-dark';sceneEl.appendChild(ov1);
+    const ov2=document.createElement('div');ov2.className='overlay-grad';sceneEl.appendChild(ov2);
+  } else {
+    const ov=document.createElement('div');ov.className='overlay-grad';sceneEl.appendChild(ov);
+  }
+
+  // Speed lines for action scenes
+  if(scene.shake||scene.flash){
+    const sl=document.createElement('div');sl.className='speedlines';sceneEl.appendChild(sl);
+  }
+
+  // Vignette
+  const vig=document.createElement('div');vig.className='vignette';sceneEl.appendChild(vig);
+
+  // Her scene special
+  if(scene.herScene) renderHerOverlay(sceneEl, lineIdx);
+
+  // Aishiteru scene
+  if(scene.aishiteruScene){ renderAishiteru(sceneEl, lineIdx); return; }
+
+  // Confetti
+  if(scene.confetti) spawnConfetti(sceneEl);
+
+  // Love scene hearts
+  if(scene.loveScene) spawnHearts(sceneEl);
+
+  // Content
+  const content=document.createElement('div');
+  content.className='content';
+  content.style.paddingBottom='100px';
+
+  // Scene label
+  const lbl=document.createElement('div');
+  lbl.className='scene-label';
+  lbl.style.color=scene.accentColor||'rgba(255,255,255,0.35)';
+  lbl.textContent=scene.label;
+  content.appendChild(lbl);
+
+  // Current line
+  const lineData=scene.lines[lineIdx];
+  if(lineData){
+    if(lineData.style==='love'||lineData.style==='love big'){
+      const box=document.createElement('div');
+      box.className='dialogue';
+      box.style.borderColor=`rgba(68,136,255,0.25)`;
+      box.style.boxShadow=`0 8px 32px rgba(0,0,0,0.5), 0 0 40px rgba(68,136,255,0.08), inset 0 1px 0 rgba(255,255,255,0.06)`;
+      const txt=document.createElement('div');
+      txt.className='dialogue-text';
+      txt.style.cssText=`font-family:'Caveat',cursive;font-size:clamp(18px,5vw,24px);font-weight:600;line-height:1.85;color:rgba(255,255,255,0.88);text-align:left;padding:4px 0;font-style:italic`;
+      txt.textContent=lineData.text;
+      box.appendChild(txt);
+      if(lineData.style==='love big'){
+        txt.style.fontSize='clamp(20px,5.5vw,26px)';
+        txt.style.textAlign='center';
+        txt.style.color='#90caf9';
+        txt.style.fontWeight='700';
+      }
+      content.appendChild(box);
+    } else {
+      buildLineEl(content, lineData, scene);
+    }
+  }
+
+  // Dots
+  const dots=document.createElement('div');dots.className='dots';
+  scene.lines.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='dot'+(i===lineIdx?' active':i<lineIdx?' done':'');
+    dots.appendChild(d);
+  });
+  content.appendChild(dots);
+  sceneEl.appendChild(content);
+}
+
+function buildLineEl(parent, lineData, scene){
+  const styles=lineData.style.split(' ');
+  const isBig=styles.includes('big');
+  const isGold=styles.includes('gold');
+  const isRed=styles.includes('red');
+  const isBlue=styles.includes('blue');
+  const isItalic=styles.includes('italic');
+  const isCinematic=styles.includes('cinematic');
+
+  if(lineData.text.startsWith('__')&&lineData.text.endsWith('__')) return;
+
+  // Pick font class based on scene type
+  const isActionScene=[3,6,7,8].includes(si); // pizza, challenge, battle, sidd fights
+  const isEpicScene=[0,1,4,5].includes(si);   // storm, prophecy, trio, reveal
+  const isEmotionalScene=[12,13,14,15].includes(si); // love, scroll, her, aishiteru
+
+  if(isBig){
+    const el=document.createElement('div');
+    // Action scenes = Bangers, epic = Cinzel, emotional = Caveat big
+    if(isActionScene){
+      el.className='main-text big';
+    } else if(isEpicScene){
+      el.className='main-text big cinematic';
+    } else {
+      el.className='main-text big';
+      el.style.fontFamily="'Caveat',cursive";
+      el.style.fontSize='clamp(30px,9vw,52px)';
+      el.style.fontWeight='700';
+    }
+    if(isGold) el.classList.add('gold');
+    if(isRed) el.classList.add('red');
+    if(isBlue) el.classList.add('blue');
+    if(isItalic) el.style.fontStyle='italic';
+    el.textContent=lineData.text;
+    el.style.marginBottom='12px';
+    el.style.textShadow=`0 0 40px ${scene.accentColor||'rgba(255,255,255,0.3)'}80`;
+    parent.appendChild(el);
+    return;
+  }
+
+  // Normal text → dialogue box
+  const box=document.createElement('div');
+  box.className='dialogue';
+  box.style.borderColor=`${scene.accentColor||'rgba(255,255,255,0.12)'}30`;
+
+  const txt=document.createElement('div');
+
+  // Choose dialogue text style
+  if(isActionScene){
+    txt.className='dialogue-text action';
+  } else if(isEmotionalScene || isItalic){
+    txt.className='dialogue-text emotional';
+  } else {
+    txt.className='dialogue-text narrate';
+  }
+
+  if(isItalic) txt.style.fontStyle='italic';
+  txt.style.color=isGold?'#ffd700':isRed?'#ff6b6b':isBlue?'#90caf9':'rgba(255,255,255,0.88)';
+  txt.textContent=lineData.text;
+  box.appendChild(txt);
+  parent.appendChild(box);
+}
+
+function renderHerOverlay(sceneEl, lineIdx){
+
+  // ── MYSTERIOUS ATMOSPHERIC SCENE ──
+  const girlWrap = document.createElement('div');
+  girlWrap.style.cssText=`
+    position:absolute;
+    inset:0;
+    z-index:5;
+    pointer-events:none;
+  `;
+
+  // Sweat drops (nervous!)
+  const sweatEmoji = lineIdx>=2 ? '💦💦' : '';
+
+  // Keychain in hand from line 3 onwards
+  const keychainHTML = lineIdx>=3 ? `
+    <!-- Keychain dangling from hand -->
+    <div style="
+      position:absolute;
+      right:-10px;
+      top:110px;
+      display:flex;flex-direction:column;align-items:center;
+      animation:keychainDangle 0.8s ease-in-out infinite;
+    ">
+      <div style="width:2px;height:14px;background:rgba(200,200,200,0.7)"></div>
+      <div style="
+        width:36px;height:50px;
+        background:linear-gradient(135deg,#d0d0d0,#f8f8f8,#b8b8b8);
+        border-radius:10px;
+        border:1.5px solid rgba(160,160,160,0.6);
+        box-shadow:0 4px 12px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.6),0 0 16px rgba(200,210,255,0.4);
+        display:flex;align-items:center;justify-content:center;
+        font-size:18px;
+      ">⚡</div>
+    </div>
+  ` : '';
+
+  // Blush from line 1 onwards
+  const blush = lineIdx>=1 ? `
+    <div style="position:absolute;left:24px;top:58px;width:16px;height:8px;background:rgba(255,120,120,0.5);border-radius:50%;filter:blur(2px)"></div>
+    <div style="position:absolute;right:24px;top:58px;width:16px;height:8px;background:rgba(255,120,120,0.5);border-radius:50%;filter:blur(2px)"></div>
+  ` : '';
+
+  // Nervous eyes (wide/squinting based on line)
+  const eyeStyle = lineIdx>=5
+    ? `<!-- shy eyes looking away -->
+       <div style="position:absolute;left:44px;top:52px;width:12px;height:6px;background:#2a1a0a;border-radius:6px 6px 0 0;transform:rotate(-10deg)"></div>
+       <div style="position:absolute;right:44px;top:52px;width:12px;height:6px;background:#2a1a0a;border-radius:6px 6px 0 0;transform:rotate(10deg)"></div>`
+    : `<!-- wide nervous eyes -->
+       <div style="position:absolute;left:38px;top:48px;width:18px;height:18px;background:white;border-radius:50%;border:2px solid #2a1a0a">
+         <div style="position:absolute;left:4px;top:4px;width:10px;height:10px;background:#2a1a0a;border-radius:50%"></div>
+         <div style="position:absolute;left:7px;top:3px;width:3px;height:3px;background:white;border-radius:50%"></div>
+       </div>
+       <div style="position:absolute;right:38px;top:48px;width:18px;height:18px;background:white;border-radius:50%;border:2px solid #2a1a0a">
+         <div style="position:absolute;left:4px;top:4px;width:10px;height:10px;background:#2a1a0a;border-radius:50%"></div>
+         <div style="position:absolute;left:7px;top:3px;width:3px;height:3px;background:white;border-radius:50%"></div>
+       </div>`;
+
+  girlWrap.innerHTML='';
+  sceneEl.appendChild(girlWrap);
+
+  // Soft warm glow in center
+  const glow=document.createElement('div');
+  glow.style.cssText=`
+    position:absolute;top:15%;left:50%;transform:translateX(-50%);
+    width:280px;height:280px;border-radius:50%;
+    background:radial-gradient(ellipse,rgba(255,200,150,0.12),transparent 70%);
+    animation:aura 3s ease-in-out infinite;pointer-events:none;
+  `;
+  sceneEl.appendChild(glow);
+
+  // Keychain from line 4 onwards
+  if(lineIdx>=4){
+    const kc=document.createElement('div');
+    kc.style.cssText=`
+      position:absolute;top:14%;left:50%;transform:translateX(-50%);
+      display:flex;flex-direction:column;align-items:center;gap:0;
+      animation:keychainDangle 2s ease-in-out infinite;z-index:20;
+    `;
+    kc.innerHTML=`
+      <style>@keyframes keychainDangle{0%,100%{transform:translateX(-50%) rotate(-4deg)}50%{transform:translateX(-50%) rotate(4deg)}}</style>
+      <div style="width:3px;height:18px;background:rgba(180,180,180,0.6);border-radius:2px"></div>
+      <div style="
+        width:52px;height:70px;
+        background:linear-gradient(135deg,#c8c8c8,#f0f0f0,#a8a8a8,#e8e8e8);
+        border-radius:14px;
+        border:1.5px solid rgba(160,160,160,0.5);
+        box-shadow:2px 2px 12px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.7),0 0 24px rgba(210,220,255,0.35);
+        display:flex;align-items:center;justify-content:center;
+        font-size:26px;position:relative;
+      ">
+        <div style="position:absolute;inset:5px;border-radius:10px;border:1px solid rgba(100,100,100,0.2)"></div>
+        ⚡
+      </div>
+      <div style="font-family:'Caveat',cursive;font-size:11px;color:rgba(255,255,255,0.35);margin-top:6px;letter-spacing:1px;font-style:italic">Sidd's keychain ✨</div>
+    `;
+    sceneEl.appendChild(kc);
+  }
+
+  // Floating sparkles
+  for(let i=0;i<10;i++){
+    const s=document.createElement('div');
+    s.style.cssText=`
+      position:absolute;
+      font-size:${8+Math.random()*14}px;
+      left:${Math.random()*85+5}%;
+      top:${Math.random()*70+5}%;
+      opacity:${0.15+Math.random()*0.35};
+      animation:aura ${2+Math.random()*2}s ease-in-out infinite;
+      animation-delay:${Math.random()*2}s;
+      pointer-events:none;
+    `;
+    s.textContent=['✨','💫','🌟','⭐'][Math.floor(Math.random()*4)];
+    sceneEl.appendChild(s);
+  }
+
+  // Heart from line 5 onwards
+  if(lineIdx>=5){
+    spawnHearts(sceneEl);
+  }
+}
+
+function renderAishiteru(sceneEl, lineIdx){
+  spawnHearts(sceneEl);
+
+  const content=document.createElement('div');
+  content.className='content';
+  content.style.gap='24px';
+
+  const lbl=document.createElement('div');
+  lbl.className='scene-label';
+  lbl.style.color='rgba(136,170,255,0.5)';
+  lbl.textContent='愛してる';
+  content.appendChild(lbl);
+
+  if(lineIdx===0){
+    const t=document.createElement('div');
+    t.className='main-text';
+    t.style.cssText='color:rgba(255,255,255,0.6);font-style:italic';
+    t.textContent='She whispered...';
+    content.appendChild(t);
+  }
+
+  if(lineIdx===1){
+    // Animate Japanese chars
+    const jp=document.createElement('div');
+    jp.style.cssText=`font-family:'Noto Sans JP',sans-serif;font-weight:900;
+      font-size:clamp(64px,18vw,110px);color:white;letter-spacing:12px;
+      text-shadow:0 0 60px rgba(136,170,255,0.8),0 0 120px rgba(68,100,255,0.4);
+      text-align:center;line-height:1`;
+    '愛してる'.split('').forEach((c,i)=>{
+      const span=document.createElement('span');
+      span.className='jp-char';
+      span.style.animationDelay=`${i*0.35}s`;
+      span.textContent=c;
+      jp.appendChild(span);
+    });
+    content.appendChild(jp);
+  }
+
+  if(lineIdx===2){
+    const div=document.createElement('div');
+    div.style.cssText=`text-align:center`;
+    const jp=document.createElement('div');
+    jp.style.cssText=`font-family:'Noto Sans JP',sans-serif;font-weight:900;
+      font-size:clamp(48px,14vw,80px);color:rgba(255,255,255,0.3);letter-spacing:10px;margin-bottom:20px`;
+    jp.textContent='愛してる';
+    const en=document.createElement('div');
+    en.className='main-text';
+    en.style.cssText='font-size:clamp(20px,5.5vw,28px);font-style:italic;color:rgba(255,255,255,0.6);animation-delay:0.3s';
+    en.textContent='I love you.';
+    div.appendChild(jp);div.appendChild(en);
+    content.appendChild(div);
+  }
+
+  if(lineIdx===3){
+    const fin=document.createElement('div');
+    fin.style.cssText='text-align:center';
+    fin.innerHTML=`
+      <div style="font-size:clamp(60px,18vw,100px);animation:aura 2s ease-in-out infinite">💙</div>
+      <div style="font-family:Cinzel,serif;font-size:12px;letter-spacing:4px;color:rgba(255,255,255,0.25);margin-top:20px">THE END</div>
+    `;
+    content.appendChild(fin);
+  }
+
+  // Dots
+  const dots=document.createElement('div');dots.className='dots';
+  SCENES[si].lines.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='dot'+(i===lineIdx?' active':i<lineIdx?' done':'');
+    dots.appendChild(d);
+  });
+  content.appendChild(dots);
+  sceneEl.appendChild(content);
+}
+
+// ═══════════════════════════════════════
+// STORY ENGINE
+// ═══════════════════════════════════════
+function loadScene(idx){
+  busy=true;
+  si=idx; li=0;
+  const screen=document.getElementById('screen');
+
+  // Remove old
+  const old=screen.querySelector('.scene');
+  if(old){old.classList.remove('active');setTimeout(()=>old.remove(),600);}
+
+  const sceneEl=document.createElement('div');
+  sceneEl.className='scene';
+  screen.appendChild(sceneEl);
+  renderScene(sceneEl, SCENES[idx], 0);
+
+  // Effects
+  const s=SCENES[idx];
+  if(s.flash) doFlash();
+  if(s.shake) doShake();
+  if(s.sfx) setTimeout(()=>{
+    const sfxEl=document.createElement('div');
+    sfxEl.className='sfx-text';
+    sfxEl.style.cssText=`color:${s.sfxColor};position:absolute;top:12%;left:50%;transform:translateX(-50%);z-index:50;white-space:nowrap`;
+    sfxEl.textContent=s.sfx;
+    sceneEl.appendChild(sfxEl);
+    setTimeout(()=>sfxEl.remove(),1800);
+  },200);
+
+  playSound(idx);
+
+  setTimeout(()=>{sceneEl.classList.add('active');busy=false;},100);
+  updateUI();
+}
+
+function updateLine(){
+  const screen=document.getElementById('screen');
+  const sceneEl=screen.querySelector('.scene');
+  if(sceneEl) renderScene(sceneEl, SCENES[si], li);
+}
+
+function nextLine(){
+  if(busy)return;
+  const s=SCENES[si];
+  if(li<s.lines.length-1){
+    li++;
+    updateLine();
+  } else if(si<SCENES.length-1){
+    loadScene(si+1);
+  }
+  updateUI();
+}
+
+function prevScene(){
+  if(busy||si===0)return;
+  loadScene(si-1);
+}
+
+function updateUI(){
+  const s=SCENES[si];
+  const pct=((si+(li+1)/Math.max(s.lines.length,1))/SCENES.length)*100;
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('counter').textContent=`${si+1} / ${SCENES.length}`;
+  const isLast=si===SCENES.length-1&&li===s.lines.length-1;
+  const hint=document.getElementById('tap-hint');
+  hint.textContent=isLast?'💙':'tap · swipe · auto';
+  startAutoScroll();
+}
+
+function startStory(){
+  const splash=document.getElementById('splash');
+  splash.style.transition='opacity 0.7s';
+  splash.style.opacity='0';
+  setTimeout(()=>{
+    splash.style.display='none';
+    document.getElementById('nav').style.display='flex';
+    // Show swipe hint briefly
+    const hint=document.getElementById('swipe-hint');
+    if(hint){ setTimeout(()=>hint.remove(), 3500); }
+    loadScene(0);
+  },700);
+}
+
+// ═══════════════════════════════════
+// AUTO SCROLL — 5 second ring timer
+// ═══════════════════════════════════
+const AUTO_DELAY=5000;
+let autoTimer=null;
+let ringStart=null;
+let ringRAF=null;
+
+function startAutoScroll(){
+  stopAutoScroll();
+  const isLast=si===SCENES.length-1&&li===SCENES[si].lines.length-1;
+  if(isLast) return; // don't auto at very end
+
+  const ring=document.getElementById('auto-ring');
+  const circle=document.getElementById('ring-circle');
+  const circumference=75.4;
+
+  ring.classList.add('visible');
+  ringStart=performance.now();
+
+  function animateRing(now){
+    const elapsed=now-ringStart;
+    const progress=Math.min(elapsed/AUTO_DELAY,1);
+    circle.style.strokeDashoffset=circumference*(1-progress);
+    if(progress<1) ringRAF=requestAnimationFrame(animateRing);
+  }
+  ringRAF=requestAnimationFrame(animateRing);
+
+  autoTimer=setTimeout(()=>{
+    nextLine();
+  },AUTO_DELAY);
+}
+
+function stopAutoScroll(){
+  if(autoTimer){clearTimeout(autoTimer);autoTimer=null;}
+  if(ringRAF){cancelAnimationFrame(ringRAF);ringRAF=null;}
+  const ring=document.getElementById('auto-ring');
+  const circle=document.getElementById('ring-circle');
+  if(ring) ring.classList.remove('visible');
+  if(circle) circle.style.strokeDashoffset='75.4';
+}
+
+// Show/hide nav buttons on long press
+let holdTimer=null;
+document.getElementById('screen').addEventListener('touchstart',e=>{
+  holdTimer=setTimeout(()=>{
+    const nav=document.getElementById('nav');
+    nav.classList.add('visible');
+    setTimeout(()=>nav.classList.remove('visible'),3000);
+  },600);
+},{passive:true});
+document.getElementById('screen').addEventListener('touchend',()=>{
+  clearTimeout(holdTimer);
+},{passive:true});
+
+// ═══════════════════════════════════
+// SWIPE & TAP
+// ═══════════════════════════════════
+let touchStartX=0,touchStartY=0,touchStartTime=0;
+
+document.getElementById('screen').addEventListener('touchstart',e=>{
+  touchStartX=e.touches[0].clientX;
+  touchStartY=e.touches[0].clientY;
+  touchStartTime=Date.now();
+},{passive:true});
+
+document.getElementById('screen').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-touchStartX;
+  const dy=e.changedTouches[0].clientY-touchStartY;
+  const dt=Date.now()-touchStartTime;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40){
+    stopAutoScroll();
+    if(dx<0) nextLine();   // swipe left = forward
+    else prevScene();       // swipe right = back
+  } else if(Math.abs(dx)<12&&Math.abs(dy)<12&&dt<300){
+    stopAutoScroll();
+    nextLine();             // quick tap = forward
+  }
+},{passive:true});
+
+// Keyboard
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '){stopAutoScroll();nextLine();}
+  else if(e.key==='ArrowLeft'){stopAutoScroll();prevScene();}
+});
+</script>
+</body>
+</html>
